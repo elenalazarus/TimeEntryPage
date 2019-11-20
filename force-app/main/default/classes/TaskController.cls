@@ -1,33 +1,41 @@
 public class TaskController {
-    public String selectedConsultant {get; set;}
-    
-    public List<Task__c> getTasks() {
+    public List<SelectOption> consultantLst {get;set;}
+    public String selectedConsultant {get;set;}
+    @AuraEnabled
+    public static List<Task__c> getTasks() {
         List<Task__c> selectedTasks = [SELECT Name, Consultant__r.Name, Project__r.Name, Billing_Rule__r.Non_billable__c  FROM Task__c WHERE Consultant__c != null];
         return selectedTasks;
     }
     
+    public static Set<Id> getTaskIds() {
+        Set<Id> taskIds = new Set<Id>();
+        List<Task__c> selectedTasks = [SELECT Id  FROM Task__c WHERE Consultant__c != null];
+        for (Task__c task : selectedTasks) {
+            taskIds.add(task.Id);
+        }
+        return taskIds;
+    }
     
-    public List<SelectOption> getConsultants() {
-        List<SelectOption> selectedConsultants = new List<SelectOption>();
+    @AuraEnabled
+    public static List<Consultant__c> getConsultants() {
+        List<Id> selectedConsultantIds = new List<Id>();
         Set<Id> consultantIds = new Set<Id>();
         for (Task__c task : getTasks()) {
-            consultantIds.add(task.Consultant__c);
+            selectedConsultantIds.add(task.Consultant__c);
         }
-        
-        for (Contact contact: [SELECT Id, Name FROM Contact WHERE Id IN :consultantIds]) {
-            selectedConsultants.add(new SelectOption(contact.Id, contact.Name));
-        }
+        List<Consultant__c> selectedConsultants = [SELECT Id FROM Consultant__c WHERE Id IN :selectedConsultantIds];
+       
         return selectedConsultants;
     }
     
-    public void getTasksforConsultant() {
-        List<Task__c> tasksForConsultant = new List<Task__c>();
-        for (Task__c task : getTasks()) {
-            if (task.Consultant__c == selectedConsultant.Id) {
-                tasksForConsultant.add(task);
-            }
-        }
-    }
+    // public void getTasksforConsultant() {
+        // List<Task__c> tasksForConsultant = new List<Task__c>();
+        // for (Task__c task : getTasks()) {
+            // if (task.Consultant__c == selectedConsultant.Id) {
+                // tasksForConsultant.add(task);
+            // }
+        // }
+    // }
     
     public List<Time__c> getTime() {
 		List<Project__c> projects = [SELECT Id FROM Project__c];        
