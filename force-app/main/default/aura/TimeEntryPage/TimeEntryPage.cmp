@@ -1,0 +1,57 @@
+<aura:component controller="TaskController" implements="flexipage:availableForAllPageTypes,force:hasRecordId" access="global" >
+    <aura:attribute name="taskList" type="Object" />
+     <aura:attribute name="options" type="Consultant__c[]" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    
+    <div class="slds-container--small slds-container--left">
+         <div class="slds-container--small slds-container--left">
+              <lightning:select name="mySelect" label="consultants:" aura:id="mySelect1" value="{!v.selectedValue}" onchange="{!c.onchange}" >
+                  <aura:iteration items="{!v.taskList}" var="t">
+                      <option text="{!t.label}" value="{!t.Consultant__r.Name}"/>
+                  </aura:iteration>
+               </lightning:select>
+           </div>     
+     </div>    
+        <table class="slds-table slds-table--bordered slds-table--cell-buffer">
+            <thead>
+                <tr class="slds-text-title--caps">
+                    <th scope="col">
+                        <div class="slds-truncate" title="Task__c">Task</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate" title="Project__c">Project</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate" title="Non_billable__c">Non-billable</div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <aura:iteration items="{!v.taskList}" var="t" indexVar="i">
+                    <tr>
+                        <th scope="row" data-label="Name">
+                            <div class="slds-truncate" title="{! t.Name }">{! t.Name }</div>
+                        </th>
+                        <td data-label="Project">
+                            <div class="slds-truncate" title="{! t.Project__r.Name }">{! t.Project__r.Name }</div>
+                        </td>
+                        <td data-label="Non-billable">
+                            <div class="slds-m-around--large">   
+                            <div class="slds-form-element">
+                                <label class="slds-checkbox_toggle slds-grid">
+                                    <span class="slds-form-element__label slds-m-bottom_none"></span>
+                                    <ui:inputCheckbox name="{!t.Id}" value="{!t.Billing_Rule__r.Non_billable__c}" disabled="true"/>
+                                    <span id="toggle-desc" class="slds-checkbox_faux_container" aria-live="assertive">
+                                        <span class="slds-checkbox_faux"></span>
+                                    </span>
+                                </label>
+                            </div>
+                            
+                        </div>
+                        </td>
+                    </tr>
+                </aura:iteration>
+            </tbody>
+        </table>
+    
+</aura:component>
