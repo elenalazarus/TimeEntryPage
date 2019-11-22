@@ -1,15 +1,15 @@
 <apex:page controller="TaskController">
      <apex:form >
-    	<apex:actionFunction action="{!getTasksforConsultant}" name="getTasksforConsultant" reRender="IdTable" />
+         <span id="idSpan" style = "display:none"> 
      	<apex:pageBlock id="tasks_list">
             <apex:pageBlockSection title="Task - Project for Consultant" columns="1" id="Details"> 
             <apex:selectList value="{!SelectedConsultant}" size="1" multiselect="false">
                 <apex:selectOptions value="{!consultants}"/>
-                <apex:actionSupport event="onchange" reRender = "wrapper"/>
+                <apex:actionSupport event="onchange" reRender="wrapper"/>
             </apex:selectList>
-                
-           <apex:outputPanel id="IdTable">
-            <apex:pageBlockTable columns="1" id="sec1" var="task" >
+           
+            <apex:pageBlockTable value="{!tasksForConsultant}" var="task" >
+              
                 <apex:column >
                      <apex:facet name="header">Project - Task</apex:facet>
                 		{!task.Project__r.Name} - {! task.Name }
@@ -19,8 +19,8 @@
                			<apex:inputcheckbox value="{!task.Billing_Rule__r.Non_billable__c}"/>
                 </apex:column>
             </apex:pageBlockTable>
-            </apex:outputPanel>
             </apex:pageBlockSection>
         </apex:pageBlock>
+         </span> 
     </apex:form>
 </apex:page>

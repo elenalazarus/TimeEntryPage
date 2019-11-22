@@ -1,20 +1,24 @@
 <aura:component controller="TaskController" implements="flexipage:availableForAllPageTypes,force:hasRecordId" access="global" >
     <aura:attribute name="taskList" type="Object" />
-     <aura:attribute name="options" type="Consultant__c[]" />
+    <aura:attribute name="times" type="Object" />
     <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:handler name="change" value="{!v.value}" action="{!c.onchange}"/>
+    	<aura:attribute name="options" type="Consultant__c[]" />
+    <aura:attribute name="selectedValue" type="String" default="Select Consultant"/>
     
     <div class="slds-container--small slds-container--left">
-         <div class="slds-container--small slds-container--left">
-              <lightning:select name="mySelect" label="consultants:" aura:id="mySelect1" value="{!v.selectedValue}" onchange="{!c.onchange}" >
-                  <aura:iteration items="{!v.taskList}" var="t">
-                      <option text="{!t.label}" value="{!t.Consultant__r.Name}"/>
-                  </aura:iteration>
-               </lightning:select>
-           </div>     
-     </div>    
-        <table class="slds-table slds-table--bordered slds-table--cell-buffer">
+        <div class="slds-container--small slds-container--left">
+            <lightning:select name="mySelect" label="Consultants:" aura:id="mySelect1" value="{!v.selectedValue}" onchange="{!c.onchange}" >
+                <aura:iteration items="{!v.taskList}" var="item">
+                    <option text="{!item.Consultant__r.Name}" value="{!item.name}" selected="{!item.selected}"/>
+                </aura:iteration>
+            </lightning:select>
+        </div>
+    </div>
+    	
+        <table class="slds-table slds-table--bordered slds-table--cell-buffer slds-max-medium-table--stacked-horizontal">
             <thead>
-                <tr class="slds-text-title--caps">
+                <tr class="slds-line-height_reset">
                     <th scope="col">
                         <div class="slds-truncate" title="Task__c">Task</div>
                     </th>
@@ -24,11 +28,33 @@
                     <th scope="col">
                         <div class="slds-truncate" title="Non_billable__c">Non-billable</div>
                     </th>
-                </tr>
+                    <th scope="col">
+                    <div class="slds-truncate" title="Task__c">Mon</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate" title="Project__c">Tue</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate" title="Non_billable__c">Wed</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate" title="Task__c">Thu</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate" title="Project__c">Fri</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate" title="Non_billable__c">Sat</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate" title="Non_billable__c">Sun</div>
+                    </th>
+                    </tr>
             </thead>
             <tbody>
+                
                 <aura:iteration items="{!v.taskList}" var="t" indexVar="i">
-                    <tr>
+                    <tr class="slds-hint-parent">
                         <th scope="row" data-label="Name">
                             <div class="slds-truncate" title="{! t.Name }">{! t.Name }</div>
                         </th>
@@ -46,11 +72,13 @@
                                     </span>
                                 </label>
                             </div>
-                            
                         </div>
                         </td>
+                        
                     </tr>
+                    
                 </aura:iteration>
+                
             </tbody>
         </table>
     
