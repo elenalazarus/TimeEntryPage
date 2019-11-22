@@ -6,16 +6,24 @@
     	<aura:attribute name="options" type="Consultant__c[]" />
     <aura:attribute name="selectedValue" type="String" default="Select Consultant"/>
     
-    <div class="slds-container--small slds-container--left">
-        <div class="slds-container--small slds-container--left">
-            <lightning:select name="mySelect" label="Consultants:" aura:id="mySelect1" value="{!v.selectedValue}" onchange="{!c.onchange}" >
-                <aura:iteration items="{!v.taskList}" var="item">
-                    <option text="{!item.Consultant__r.Name}" value="{!item.name}" selected="{!item.selected}"/>
-                </aura:iteration>
-            </lightning:select>
-        </div>
-    </div>
-    	
+    <div class="slds-box slds-theme_default">
+ 
+          <div class="slds-form-element__control">
+            <div class="slds-combobox_container slds-size_small">
+              <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click" aria-expanded="false" aria-haspopup="listbox" role="combobox">
+                <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+          
+                <lightning:select name="mySelect" label="Consultants:" aura:id="mySelect1" value="{!v.selectedValue}" onchange="{!c.onchange}" >
+                    <aura:iteration items="{!v.taskList}" var="item">
+                        <option text="{!item.Consultant__r.Name}" value="{!item.name}" selected="{!item.selected}"/>
+                    </aura:iteration>
+                </lightning:select>
+            	</div>
+        	  </div>
+    		</div>
+           </div>
+     
+    	<div class="slds-p-top_small">
         <table class="slds-table slds-table--bordered slds-table--cell-buffer slds-max-medium-table--stacked-horizontal">
             <thead>
                 <tr class="slds-line-height_reset">
@@ -81,5 +89,7 @@
                 
             </tbody>
         </table>
+        </div>
+        </div>
     
 </aura:component>
