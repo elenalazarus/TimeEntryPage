@@ -1,13 +1,21 @@
 ({
-    doInit : function(component) {
-
-        var action = component.get("c.getTasks");
+    init : function(component) {
+        var cons = component.find("consultant");
+		var picklistValue = cons.get("v.value");
+        var action = component.get('c.initClass');
+        action.setParams({
+            consultantId: picklistValue,
+        });
         
        	action.setCallback(this, function(response){
-            
-            var data = response.getReturnValue();
-            console.log(data);
-            component.set("v.taskList", data);
+            if (response.getState() === "SUCCESS") {
+                component.set('v.objTimeEntryModel', response.getReturnValue());
+                component.set('v.defaultConsultant', response.getReturnValue().defaultConsultant);
+                component.set('v.defaultWeekDate', response.getReturnValue().defaultWeekDate);
+            }
+            else {
+                console.log("Failed with state: " + response.getState());
+            }
         });
        
 
@@ -15,25 +23,31 @@
 
     },
     
-    getNeededTasks: function(component){
-        var action = component.get("c.getNeededTasks");
+    getNeededTasks: function(component, event){
+        var cons = component.find("consultant");
+		var picklistValue = cons.get("v.value");
+        var weekD = component.find("weekDate");
+		var picklistWeekD = weekD.get("v.value");
+        var action = component.get("c.initClassWithNeededTasks");
         action.setParams({
-            recordId: recID
+            consultantId: picklistValue,
+            weekDate: picklistWeekD
         });
         
         action.setCallback(this, function(response){
-            
-            var data = response.getReturnValue();
-            console.log(data);
-            console.log("Hello");
-            var options = []; 
-		        
-            for(var i = 0; i < data.length; i++){
-                options.push({selected: false, label: data[i].Consultant__r.Name, value: data[i].Consultant__c});
-            } 
-        	component.set("v.options", options);
-        	$A.enqueueAction(action);
+            if (response.getState() === "SUCCESS") {
+                console.log('hello');
+                component.set('v.objTimeEntryModel', response.getReturnValue());
+                component.set('v.defaultConsultant', response.getReturnValue().defaultConsultant);
+                component.set('v.defaultWeekDate', response.getReturnValue().defaultWeekDate);
+            }
+            else {
+                console.log("Failed with state: " + response.getState());
+            }
         });
+       
+
+        $A.enqueueAction(action);
 	},
         
 })
