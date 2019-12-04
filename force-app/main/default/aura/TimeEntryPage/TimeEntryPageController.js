@@ -5,7 +5,11 @@
         
     },
     
-    onchange: function(component, event, helper) {
-        helper.getNeededTasks(component, event);
+    onConsultantChange: function(component, event, helper) {
+        helper.getNeededTasks(component);
+    },
+    
+    onWeekDateChange: function(component, event, helper) {
+        helper.getNeededTimes(component, event);
     },
 })

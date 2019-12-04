@@ -1,10 +1,10 @@
-<aura:component controller="TimeEntryModel" implements="flexipage:availableForAllPageTypes,force:hasRecordId" access="global" >
+<aura:component controller="TaskController" implements="flexipage:availableForAllPageTypes">
     <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
-    <aura:attribute name="objTimeEntryModel" type="TimeEntryModel" />
-    <aura:handler name="change" value="{!v.value}" action="{!c.onchange}"/>
-    <aura:attribute name="defaultConsultant" type="Consultant__c" default="true" />
-    <aura:attribute name="defaultWeekDate" type="Date" default="true" />
-    
+    <aura:attribute name="objTimeEntryModel" type="TaskController.TimeEntryModel" />
+    <aura:attribute name="currentConsultant" type="Contact"/>
+    <aura:attribute name="currentWeekDate" type="Date" />
+    <aura:attribute name="consultants" type="List" />
+    <aura:attribute name="coverageDate" type="Date"/>
     
     <div class="slds-box slds-theme_default">
           <div class="slds-form-element__control">
@@ -12,26 +12,19 @@
             <div class="slds-combobox_container slds-size_small">
               <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click" aria-expanded="false" aria-haspopup="listbox" role="combobox">
                 <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
-          		
-                <lightning:select name="consultant" label="Consultants:" aura:id="consultant" value="{!v.defaultConsultant.Id}" onchange="{!c.onchange}" >
-                    <option value="{!v.defaultConsultant}">{!v.defaultConsultant.Name}</option>
-                    <aura:iteration items="{!v.objTimeEntryModel.consultants}" var="c">
-                        <option value="{!c.Id}">{!c.Name}</option>
-                    </aura:iteration>
-                </lightning:select>
+          		<lightning:combobox label="Consultant" name="consultant" value="{!v.currentConsultant}" 
+                                    options="{!v.consultants}"
+                                    onchange="{!c.onConsultantChange}"/>
+                
             	</div>
         	  </div>
     		</div>
             <div class="slds-combobox_container slds-size_small">
               <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click" aria-expanded="false" aria-haspopup="listbox" role="combobox">
                 <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
-          		
-                <lightning:select name="weekDate" label="Week date:" aura:id="weekDate" value="{!v.defaultWeekDate}" onchange="{!c.onchange}" >
-                    <option value="{!v.defaultWeekDate}">{!v.defaultWeekDate}</option>
-                    <aura:iteration items="{!v.objTimeEntryModel.weekDates}" var="d">
-                        <option value="{!d.Id}">{!d}</option>
-                    </aura:iteration>
-                </lightning:select>
+          		<lightning:combobox label="Week date" name="weekDate" value="{!v.currentWeekDate}" 
+                                    options="{!v.weekdates}"
+                                    onchange="{!c.onWeekDateChange}"/>
             	</div>
         	  </div>
     		</div>
@@ -79,9 +72,9 @@
                 
                 <aura:iteration items="{!v.objTimeEntryModel.tasks}" var="t" indexVar="i">
                     <tr class="slds-hint-parent">
-                        <th scope="row" data-label="Name">
+                        <td scope="row" data-label="Name">
                             <div class="slds-truncate" title="{! t.Name }">{! t.Name }</div>
-                        </th>
+                        </td>
                         <td data-label="Project">
                             <div class="slds-truncate" title="{! t.Project__r.Name }">{! t.Project__r.Name }</div>
                         </td>

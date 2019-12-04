@@ -1,22 +1,97 @@
 public class TaskController {
-    public List<SelectOption> consultantLst {get;set;}
-    public String selectedConsultant {get;set;}
+    public TimeEntryModel tem {get;set;}
+    public updatedTimeEntryModel updatedTem {get;set;}
+    
     
     @AuraEnabled
-    public static TimeEntryModel initData() {
-        Id defaultConsultantId = [SELECT Primary_Contact__c FROM Project__c WHERE Primary_Contact__c != null][0].Primary_Contact__c;
-        TimeEntryModel tem = new TimeEntryModel(defaultConsultantId);
-        System.debug(tem.tasks);
-        System.debug(tem.consultantNames);
-        System.debug(tem);
+    public static TimeEntryModel initModel() {
+        Id currentConsultantId = [SELECT Primary_Contact__c FROM Project__c WHERE Primary_Contact__c != null][0].Primary_Contact__c;
+        Contact currentConsultant = [SELECT Id, Name FROM Contact WHERE Id = :currentConsultantId];
+        TimeEntryModel tem = new TimeEntryModel();
+        tem.consultants = getConsultants();
+        tem.currentWeekDate = Date.today().toStartofWeek();
+        tem.currentConsultant = currentConsultant;
+        tem.tasks = getTasks(currentConsultant.Id);
+        tem.weekDates = getWeekDates(tem.currentWeekDate);
+        tem.times = getTimes(tem.tasks, tem.currentWeekDate);
         return tem;
+    }
+    
+    public static List<Contact> getConsultants() {
+        List<Id> consultantIds = new List<Id>();
+        List<Project__c> projects = [SELECT Primary_Contact__c FROM Project__c WHERE Primary_Contact__c != null];
+        
+        for (Project__c project : projects) {
+            consultantIds.add(project.Primary_Contact__c);
+        }
+        List<Contact> allConsultants = [SELECT Name FROM Contact WHERE Id IN :consultantIds];
+        return allConsultants;
+    }
+    
+    public static List<Task__c> getTasks(Id consultantId) {
+        List<Task__c> selectedTasks = [
+            SELECT Name, 
+            	(SELECT Time_spend__c, Date__c FROM Times__r), 
+                Consultant__r.Name, 
+                Project__r.Name, 
+                Billing_Rule__r.Non_billable__c  
+            FROM Task__c 
+            WHERE Consultant__c = :consultantId];
+        return selectedTasks;
+    }
+    
+    public static List<Date> getWeekDates(Date weekDate) {
+        Date currentWeekDate = Date.today().toStartofWeek();
+        List<Date> previousWeekDates = new List<Date>{currentWeekDate};
+        Integer numberOfpreviousWeeks = 5;
+        
+        
+        for (Integer i = 0; i < numberOfpreviousWeeks; i ++) {
+            currentWeekDate = currentWeekDate.addDays(-7);
+            if (currentWeekDate != weekDate) {
+                previousWeekDates.add(currentWeekDate);
+            }
+        }
+        System.debug(previousWeekDates);
+        return previousWeekDates;
+    }
+    
+    public static List<Time__c> getTimes(List<Task__c> tasks, Date currentWeekDate) {
+        List<Time__c> times = [SELECT Time_spend__c, Date__c FROM Time__c WHERE Task__c IN :tasks AND Date__c >= :currentWeekDate];
+        return times;
+    }
+    
+    @AuraEnabled
+    public static updatedTimeEntryModel initClassWithNeededTasks(Id consultantId) {
+        updatedTimeEntryModel updatedTem = new updatedTimeEntryModel();
+        updatedTem.tasks = getTasks(consultantId);
+        return updatedTem;
         
     }
+    
+    public with sharing class TimeEntryModel {
     @AuraEnabled
-    public static TimeEntryModel buildModel(Id consultantId) {
-        TimeEntryModel tem = new TimeEntryModel(consultantId);
-        return tem;
-    } 
+    public List<Task__c> tasks {get;set;}
+    @AuraEnabled
+    public List<Contact> consultants{get; set;}
+    @AuraEnabled
+    public Contact currentConsultant{get; set;}
+    @AuraEnabled
+    public List<Time__c> times{get; set;}
+    @AuraEnabled
+    public Date currentWeekDate{get; set;}
+    @AuraEnabled
+    public List<Date> weekDates {get; set;}    
+	}
+    
+    public with sharing class UpdatedTimeEntryModel{
+    @AuraEnabled
+    public List<Task__c> tasks {get;set;}
+    @AuraEnabled
+    public Contact currentConsultant{get; set;}
+    @AuraEnabled
+    public List<Time__c> times{get; set;} 
+	}
    
 
 }
