@@ -10,6 +10,6 @@
     },
     
     onWeekDateChange: function(component, event, helper) {
-        helper.getNeededTimes(component, event);
+        helper.getNeededTimes(component);
     },
 })

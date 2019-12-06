@@ -13,7 +13,7 @@ public class TaskController {
         tem.currentConsultant = currentConsultant;
         tem.tasks = getTasks(currentConsultant.Id);
         tem.weekDates = getWeekDates(tem.currentWeekDate);
-        tem.times = getTimes(tem.tasks, tem.currentWeekDate);
+        tem.taskIdToTimes = getTimes(tem.tasks, tem.currentWeekDate);
         return tem;
     }
     
@@ -56,10 +56,46 @@ public class TaskController {
         return previousWeekDates;
     }
     
-    public static List<Time__c> getTimes(List<Task__c> tasks, Date currentWeekDate) {
-        List<Time__c> times = [SELECT Time_spend__c, Date__c FROM Time__c WHERE Task__c IN :tasks AND Date__c >= :currentWeekDate];
-        return times;
+    
+    public static Map<Id, List<Time__c>> getTimes(List<Task__c> tasks, Date currentWeekDate) {
+        Map<Id, List<Time__c>> taskIdToTimes = new Map<Id, List<Time__c>>();
+        for (Task__c task : tasks) {
+            List<Time__c> allTimes = getTimesByTask(currentWeekDate, task);
+            taskIdToTimes.put(task.Id, allTimes);
+        }
+            
+        return taskIdToTimes;
     }
+
+    public static List<Time__c> getTimesByTask(Date currentWeekDate, Task__c task) {
+        Integer numberOfWorkDays = 7;
+        List<Time__c> times = [SELECT Time_spend__c, Date__c, Task__c, Task__r.Billing_Rule__c, Task__r.Project__c 
+                               FROM Time__c 
+                               WHERE Task__c = :task.Id 
+                               	   AND Date__c >= :currentWeekDate
+                                   AND Date__c <= :currentWeekDate.addDays(6)
+                                   
+        ];
+        Map<Date, Time__c> workDateToTime = new Map<Date, Time__c>();
+        for (Integer i = 0; i < times.size(); i++) {
+            workDateToTime.put(times[i].Date__c, times[i]);
+        }
+        
+        for (Integer i = 0; i < numberOfWorkDays; i++) {
+            if (!workDateToTime.containsKey(currentWeekDate.addDays(i))) {
+                Time__c emptyTime = new Time__c(
+                        Name=currentWeekDate.addDays(i) + ' ' + task.Id,
+                        Billing_Rule__c=task.Billing_Rule__c,
+                        Task__c=task.Id,
+                        Project__c=task.Project__c,
+                    	Date__c=currentWeekDate.addDays(i),
+                    	Time_spend__c=0);
+                workDateToTime.put(currentWeekDate.addDays(i), emptyTime);
+            }
+        }
+        return workDateToTime.values();
+    }
+   
     
     @AuraEnabled
     public static updatedTimeEntryModel initClassWithNeededTasks(Id consultantId) {
@@ -81,7 +117,9 @@ public class TaskController {
     @AuraEnabled
     public Date currentWeekDate{get; set;}
     @AuraEnabled
-    public List<Date> weekDates {get; set;}    
+    public List<Date> weekDates {get; set;}
+    @AuraEnabled
+    public Map<Id, List<Time__c>> taskIdToTimes{get; set;}
 	}
     
     public with sharing class UpdatedTimeEntryModel{
@@ -91,6 +129,8 @@ public class TaskController {
     public Contact currentConsultant{get; set;}
     @AuraEnabled
     public List<Time__c> times{get; set;} 
+    @AuraEnabled
+    public Map<Id, List<Time__c>> taskIdToTimes{get; set;}
 	}
    
 

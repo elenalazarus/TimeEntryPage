@@ -4,7 +4,9 @@
     <aura:attribute name="currentConsultant" type="Contact"/>
     <aura:attribute name="currentWeekDate" type="Date" />
     <aura:attribute name="consultants" type="List" />
+    <aura:attribute name="weekDates" type="List" />
     <aura:attribute name="coverageDate" type="Date"/>
+    <aura:attribute name="taskIdToTimes" type="List"/>
     
     <div class="slds-box slds-theme_default">
           <div class="slds-form-element__control">
@@ -23,7 +25,7 @@
               <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click" aria-expanded="false" aria-haspopup="listbox" role="combobox">
                 <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
           		<lightning:combobox label="Week date" name="weekDate" value="{!v.currentWeekDate}" 
-                                    options="{!v.weekdates}"
+                                    options="{!v.weekDates}"
                                     onchange="{!c.onWeekDateChange}"/>
             	</div>
         	  </div>
@@ -71,7 +73,7 @@
             <tbody>
                 
                 <aura:iteration items="{!v.objTimeEntryModel.tasks}" var="t" indexVar="i">
-                    <tr class="slds-hint-parent">
+                    <tr>
                         <td scope="row" data-label="Name">
                             <div class="slds-truncate" title="{! t.Name }">{! t.Name }</div>
                         </td>
@@ -91,10 +93,16 @@
                             </div>
                         </div>
                         </td>
+                    <aura:iteration items="{!v.taskIdToTimes}" var="time" indexVar="key">
+                        <td>
+                            <div class="slds-truncate" title="{!time.value}">{!time.value}</div>
+                        </td>
                         
+                    </aura:iteration>
                     </tr>
-                    
+               		
                 </aura:iteration>
+                
             </tbody>
         </table>
         </div>
