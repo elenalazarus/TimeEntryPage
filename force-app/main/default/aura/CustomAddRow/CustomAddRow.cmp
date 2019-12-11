@@ -1,0 +1,25 @@
+<aura:component controller="CustomAddRowController" description="Form for adding project-task pair" implements="flexipage:availableForAllPageTypes">
+    <aura:attribute name="taskWrappers" type="List" required="true" />
+    <aura:attribute name="projects" type="List"/>
+    <aura:attribute name="tasks" type="List"/>
+    <aura:attribute name="currentTask" type="Task" default="Choose Task"/>
+    <aura:attribute name="currentProject" type="List" default="Choose Project" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+
+    <lightning:layout horizontalAlign="center">
+        <lightning:layoutItem>
+            <div class="slds-combobox_container slds-size_small">
+                <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click"
+                    aria-expanded="false" aria-haspopup="listbox" role="combobox">
+                    <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right"
+                    role="none">
+                        <lightning:combobox label="Project" name="project" value="{!v.currentProject}" 
+                            options="{!v.projects}"
+                            onchange="{!c.onProjectChange}"/>
+                    </div>
+                </div>
+            </div>
+        </lightning:layoutItem>
+    </lightning:layout>
+</aura:component>

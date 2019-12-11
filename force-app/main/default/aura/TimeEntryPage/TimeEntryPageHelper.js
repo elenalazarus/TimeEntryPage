@@ -1,14 +1,12 @@
 ({
     init : function(component) {
-    
         var action = component.get('c.initModel');
-        
-       	action.setCallback(this, function(response){
+        action.setCallback(this, function(response){
             if (response.getState() === "SUCCESS") {
                 var consultantOptions = []
                 var weekDateOptions = []
-                var taskIdToTimes = []
                 var model = response.getReturnValue();
+                console.log(model);
                 for (var i = 0; i < model.consultants.length; i++) {
                     consultantOptions.push({'label' : model.consultants[i].Name, 'value' : model.consultants[i].Id});
                 }
@@ -20,50 +18,46 @@
                 component.set('v.currentConsultant', model.currentConsultant.Id);
                 component.set('v.currentWeekDate', model.currentWeekDate);
                 component.set('v.weekDates', weekDateOptions);
-                for (var key in model.taskIdToTimes) {
-                    taskIdToTimes.push({value:model.taskIdToTimes[key], key:key})
-                }
-                component.set('v.taskIdToTimes', model.taskIdToTimes);
             }
             else {
                 console.log("Failed with state: " + response.getState());
             }
         });
-       
-
         $A.enqueueAction(action);
-
     },
-    
+
     getNeededTasks : function(component) {
-        var picklistValue = component.get("v.currentConsultant");
+        var currentConsultant = component.get("v.currentConsultant");
+        var currentWeekDate = component.get("v.currentWeekDate");
         var action = component.get("c.initClassWithNeededTasks");
         action.setParams({
-            consultantId: picklistValue
+            consultantId : currentConsultant,
+            currentWeekDate : currentWeekDate
         });
-        
+
         action.setCallback(this, function(response) {
             if (response.getState() === "SUCCESS") {
                 var updatedData = response.getReturnValue();
-                component.set('v.objTimeEntryModel.tasks', updatedData.tasks);
+                component.set('v.objTimeEntryModel.taskWrappers', updatedData.taskWrappers);
             }
             else {
                 console.log("Failed with state: " + response.getState());
             }
         });
-       
-
         $A.enqueueAction(action);
-	},
-    
-    getNeededTimes : function(component) {
-        var currentDate = component.get("c.currentDate")
-        action.setCallback(this, function(response) {
-            if (response.getSate() == "SUCCESS") {
-                
-            }
-        })
-        
-    }
-        
+    },
+
+    closeModal : function(component,event,helper){    
+        var cmpTarget = component.find('Modalbox');
+        var cmpBack = component.find('Modalbackdrop');
+        $A.util.removeClass(cmpBack,'slds-backdrop--open');
+        $A.util.removeClass(cmpTarget, 'slds-fade-in-open'); 
+    },
+
+    openmodal : function(component,event,helper) {
+        var cmpTarget = component.find('Modalbox');
+        var cmpBack = component.find('Modalbackdrop');
+        $A.util.addClass(cmpTarget, 'slds-fade-in-open');
+        $A.util.addClass(cmpBack, 'slds-backdrop--open'); 
+    },
 })

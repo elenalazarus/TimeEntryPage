@@ -6,106 +6,120 @@
     <aura:attribute name="consultants" type="List" />
     <aura:attribute name="weekDates" type="List" />
     <aura:attribute name="coverageDate" type="Date"/>
-    <aura:attribute name="taskIdToTimes" type="List"/>
-    
+    <aura:attribute name="tasksToTimeSpend" type="Map"/>
+    <aura:attribute name="showModalAddRow" type="Boolean" default="false" />
+
     <div class="slds-box slds-theme_default">
-          <div class="slds-form-element__control">
+        <div class="slds-form-element__control">
             <div class="slds-form_horizontal slds-form slds-grid slds-wrap">
-            <div class="slds-combobox_container slds-size_small">
-              <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click" aria-expanded="false" aria-haspopup="listbox" role="combobox">
-                <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
-          		<lightning:combobox label="Consultant" name="consultant" value="{!v.currentConsultant}" 
-                                    options="{!v.consultants}"
-                                    onchange="{!c.onConsultantChange}"/>
-                
-            	</div>
-        	  </div>
-    		</div>
-            <div class="slds-combobox_container slds-size_small">
-              <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click" aria-expanded="false" aria-haspopup="listbox" role="combobox">
-                <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
-          		<lightning:combobox label="Week date" name="weekDate" value="{!v.currentWeekDate}" 
-                                    options="{!v.weekDates}"
-                                    onchange="{!c.onWeekDateChange}"/>
-            	</div>
-        	  </div>
-    		</div>
-           </div>
-           
-        </div>
-     
-    	<div class="slds-p-top_small">
-        <table class="slds-table slds-table--bordered slds-table--cell-buffer slds-max-medium-table--stacked-horizontal">
-            <thead>
-                <tr class="slds-line-height_reset">
-                    <th scope="col">
-                        <div class="slds-truncate" title="Task__c">Task</div>
-                    </th>
-                    <th scope="col">
-                        <div class="slds-truncate" title="Project__c">Project</div>
-                    </th>
-                    <th scope="col">
-                        <div class="slds-truncate" title="Non_billable__c">Non-billable</div>
-                    </th>
-                    <th scope="col">
-                    <div class="slds-truncate" title="Task__c">Mon</div>
-                    </th>
-                    <th scope="col">
-                        <div class="slds-truncate" title="Project__c">Tue</div>
-                    </th>
-                    <th scope="col">
-                        <div class="slds-truncate" title="Non_billable__c">Wed</div>
-                    </th>
-                    <th scope="col">
-                        <div class="slds-truncate" title="Task__c">Thu</div>
-                    </th>
-                    <th scope="col">
-                        <div class="slds-truncate" title="Project__c">Fri</div>
-                    </th>
-                    <th scope="col">
-                        <div class="slds-truncate" title="Non_billable__c">Sat</div>
-                    </th>
-                    <th scope="col">
-                        <div class="slds-truncate" title="Non_billable__c">Sun</div>
-                    </th>
-                    </tr>
-            </thead>
-            <tbody>
-                
-                <aura:iteration items="{!v.objTimeEntryModel.tasks}" var="t" indexVar="i">
-                    <tr>
-                        <td scope="row" data-label="Name">
-                            <div class="slds-truncate" title="{! t.Name }">{! t.Name }</div>
-                        </td>
-                        <td data-label="Project">
-                            <div class="slds-truncate" title="{! t.Project__r.Name }">{! t.Project__r.Name }</div>
-                        </td>
-                        <td data-label="Non-billable">
-                            <div class="slds-m-around--large">   
-                            <div class="slds-form-element">
-                                <label class="slds-checkbox_toggle slds-grid">
-                                    <span class="slds-form-element__label slds-m-bottom_none"></span>
-                                    <ui:inputCheckbox name="{!t.Id}" value="{!t.Billing_Rule__r.Non_billable__c}" disabled="true"/>
-                                    <span id="toggle-desc" class="slds-checkbox_faux_container" aria-live="assertive">
-                                        <span class="slds-checkbox_faux"></span>
-                                    </span>
-                                </label>
-                            </div>
+                <div class="slds-combobox_container slds-size_small">
+                    <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click"
+                        aria-expanded="false" aria-haspopup="listbox" role="combobox">
+                        <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right"
+                        role="none">
+                            <lightning:combobox label="Consultant" name="consultant" value="{!v.currentConsultant}" 
+                                options="{!v.consultants}"
+                                onchange="{!c.onConsultantChange}"/>
                         </div>
-                        </td>
-                    <aura:iteration items="{!v.taskIdToTimes}" var="time" indexVar="key">
-                        <td>
-                            <div class="slds-truncate" title="{!time.value}">{!time.value}</div>
-                        </td>
-                        
-                    </aura:iteration>
+                    </div>
+                </div>
+                <div class="slds-combobox_container slds-size_small">
+                    <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click" 
+                        aria-expanded="false" aria-haspopup="listbox" role="combobox">
+                        <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" 
+                            role="none">
+                            <lightning:combobox label="Week date" name="weekDate" value="{!v.currentWeekDate}" 
+                                options="{!v.weekDates}"
+                                onchange="{!c.onWeekDateChange}"/>
+                        </div>
+                    </div>
+                </div>
+           </div>
+        </div>
+
+        <div class="slds-p-top_small">
+            <table class="slds-table slds-table--bordered slds-table--cell-buffer slds-max-medium-table--stacked-horizontal">
+                <thead>
+                    <tr class="slds-line-height_reset">
+                        <th scope="col">
+                            <div class="slds-truncate" title="Task__c">Task</div>
+                        </th>
+                        <th scope="col">
+                            <div class="slds-truncate" title="Project__c">Project</div>
+                        </th>
+                        <th scope="col">
+                            <div class="slds-truncate" title="Non_billable__c">Non-billable</div>
+                        </th>
+                        <th scope="col">
+                            <div class="slds-truncate" title="Task__c">Mon</div>
+                        </th>
+                        <th scope="col">
+                            <div class="slds-truncate" title="Project__c">Tue</div>
+                        </th>
+                        <th scope="col">
+                            <div class="slds-truncate" title="Non_billable__c">Wed</div>
+                        </th>
+                        <th scope="col">
+                            <div class="slds-truncate" title="Task__c">Thu</div>
+                        </th>
+                        <th scope="col">
+                            <div class="slds-truncate" title="Project__c">Fri</div>
+                        </th>
+                        <th scope="col">
+                            <div class="slds-truncate" title="Non_billable__c">Sat</div>
+                        </th>
+                        <th scope="col">
+                            <div class="slds-truncate" title="Non_billable__c">Sun</div>
+                        </th>
                     </tr>
-               		
-                </aura:iteration>
-                
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    <aura:iteration items="{!v.objTimeEntryModel.taskWrappers}" var="taskWrapper" indexVar="i">
+                        <tr>
+                            <td data-label="Name">
+                                <div class="slds-truncate" title="{! taskWrapper.task.Name }">{! taskWrapper.task.Name }</div>
+                            </td>
+                            <td data-label="Project">
+                                <div class="slds-truncate" title="{! taskWrapper.task.Project__r.Name }">{! taskWrapper.task.Project__r.Name }</div>
+                            </td>
+                            <td data-label="Non-billable">
+                                <div class="slds-m-around--large">   
+                                    <div class="slds-form-element">
+                                        <label class="slds-checkbox_toggle slds-grid">
+                                            <span class="slds-form-element__label slds-m-bottom_none"></span>
+                                            <ui:inputCheckbox name="{!taskWrapper.task.Id}"
+                                                value="{!taskWrapper.task.Billing_Rule__r.Non_billable__c}"
+                                                disabled="true"/>
+                                            <span id="toggle-desc" class="slds-checkbox_faux_container"
+                                                aria-live="assertive">
+                                            <span class="slds-checkbox_faux"></span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </td>
+                        <aura:iteration items="{!taskWrapper.times}" var="time" indexVar="j">
+                            <td>
+                                <div class="slds-truncate" title="{!time.Time_spend__c}">{!time.Time_spend__c}</div>
+                            </td>
+                        </aura:iteration>
+                        </tr>
+                    </aura:iteration>
+                </tbody>
+            </table>
         </div>
+        <div class="slds-p-top_small">
+            <lightning:button label="Add Row" title="Add Row" onclick="{! c.handleModalAddRowOpen }"/>
         </div>
-    
+        <c:AddRowModalComponent title="Add Row" isActive="{!v.showModalAddRow}">
+        <!-- Content of the modal window -->
+        <c:CustomAddRow taskWrappers="{!v.objTimeEntryModel.taskWrappers}" />
+
+        <aura:set attribute="footer">
+            <lightning:button variant="neutral" label="Cancel" onclick="{!c.handleModalAddRowCancel}" />
+            <lightning:button variant="brand" label="Save" onclick="{!c.handleModalAddRowSave}" />
+        </aura:set>
+        </c:AddRowModalComponent>
+
+    </div>
 </aura:component>
