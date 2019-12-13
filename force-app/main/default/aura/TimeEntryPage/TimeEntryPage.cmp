@@ -111,15 +111,14 @@
         <div class="slds-p-top_small">
             <lightning:button label="Add Row" title="Add Row" onclick="{! c.handleModalAddRowOpen }"/>
         </div>
-        <c:AddRowModalComponent title="Add Row" isActive="{!v.showModalAddRow}">
-        <!-- Content of the modal window -->
-        <c:CustomAddRow taskWrappers="{!v.objTimeEntryModel.taskWrappers}" />
+        <c:AddRowModal title="Add Row" isActive="{!v.showModalAddRow}">
+        <c:CustomAddRow taskWrappers="{!v.objTimeEntryModel.taskWrappers}" /> 
 
         <aura:set attribute="footer">
             <lightning:button variant="neutral" label="Cancel" onclick="{!c.handleModalAddRowCancel}" />
             <lightning:button variant="brand" label="Save" onclick="{!c.handleModalAddRowSave}" />
-        </aura:set>
-        </c:AddRowModalComponent>
+         </aura:set>
+        </c:AddRowModal>
 
     </div>
 </aura:component>
