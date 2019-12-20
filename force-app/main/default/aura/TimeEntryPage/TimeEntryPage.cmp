@@ -1,12 +1,15 @@
 <aura:component controller="TaskController" implements="flexipage:availableForAllPageTypes">
     <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
     <aura:attribute name="objTimeEntryModel" type="TaskController.TimeEntryModel" />
-    <aura:attribute name="currentConsultant" type="Contact"/>
+    <aura:attribute name="currentConsultant" type="Id"/>
+    <aura:attribute name="currentProject" type="Id"/>
+    <aura:attribute name="currentTask" type="Id"/>
     <aura:attribute name="currentWeekDate" type="Date" />
     <aura:attribute name="consultants" type="List" />
     <aura:attribute name="weekDates" type="List" />
     <aura:attribute name="coverageDate" type="Date"/>
-    <aura:attribute name="tasksToTimeSpend" type="Map"/>
+    <aura:attribute name="allProjectOptions" type="List"/>
+    <aura:attribute name="notReportedTaskOptions" type="List" />
     <aura:attribute name="showModalAddRow" type="Boolean" default="false" />
 
     <div class="slds-box slds-theme_default">
@@ -103,22 +106,57 @@
                                 <div class="slds-truncate" title="{!time.Time_spend__c}">{!time.Time_spend__c}</div>
                             </td>
                         </aura:iteration>
+                        <lightning:button label="x" title="x" onclick="{! c.onDeleteClick }"/>
                         </tr>
                     </aura:iteration>
                 </tbody>
             </table>
         </div>
         <div class="slds-p-top_small">
-            <lightning:button label="Add Row" title="Add Row" onclick="{! c.handleModalAddRowOpen }"/>
+            <lightning:button label="Add Row" title="Add Row" onclick="{! c.onAddRowClick }"/>
+            <lightning:button label="Save" title="Save" onclick="{! c.onSaveClick }"/>
         </div>
-        <c:AddRowModal title="Add Row" isActive="{!v.showModalAddRow}">
-        <c:CustomAddRow taskWrappers="{!v.objTimeEntryModel.taskWrappers}" /> 
 
-        <aura:set attribute="footer">
-            <lightning:button variant="neutral" label="Cancel" onclick="{!c.handleModalAddRowCancel}" />
-            <lightning:button variant="brand" label="Save" onclick="{!c.handleModalAddRowSave}" />
-         </aura:set>
-        </c:AddRowModal>
-
+        <aura:if isTrue="{!v.showModalAddRow}">
+            <section role="dialog" tabindex="-1" aria-describedby="modal-content-id-1"
+                class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon alternativeText="Close" onclick="{!c.handleCancel}"
+                            iconName="utility:close" variant="bare" size="large"
+                            class="slds-modal__close slds-button_icon-inverse" />
+                            <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Add Row</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around--large" id="modal-content-id-1">
+                                <div class="slds-combobox_container slds-size_small">
+                                    <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click"
+                                        aria-expanded="false" aria-haspopup="listbox" role="combobox">
+                                        <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right"
+                                        role="none">
+                                            <lightning:combobox label="Project" name="project" value="{!v.currentProject}" 
+                                                options="{!v.allProjectOptions}"
+                                                onchange="{!c.onProjectChange}"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-combobox_container slds-size_small">
+                                    <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click"
+                                        aria-expanded="false" aria-haspopup="listbox" role="combobox">
+                                        <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right"
+                                        role="none">
+                                            <lightning:combobox label="Task" name="task" value="{!v.currentTask}" 
+                                                options="{!v.notReportedTaskOptions}"/>
+                                        </div>
+                                    </div>
+                                </div>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <lightning:button variant="neutral" label="Cancel" onclick="{!c.onAddRowCancelClick}" />
+                        <lightning:button variant="brand" label="Save" onclick="{!c.onAddRowSaveClick}" />
+                    </footer>
+                </div>
+            </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>
     </div>
 </aura:component>

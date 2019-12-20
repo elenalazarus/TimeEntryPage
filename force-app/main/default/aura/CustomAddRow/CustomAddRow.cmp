@@ -1,5 +1,6 @@
-<aura:component controller="CustomAddRowController" description="Form for adding project-task pair" implements="flexipage:availableForAllPageTypes">
+<aura:component controller="ProjectController" implements="flexipage:availableForAllPageTypes">
     <aura:attribute name="taskWrappers" type="List" required="true" />
+    <aura:attribute name="currentConsultant" type="Contact" required="true" />
     <aura:attribute name="projects" type="List"/>
     <aura:attribute name="tasks" type="List"/>
     <aura:attribute name="currentTask" type="Task"/>
@@ -29,8 +30,7 @@
                     <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right"
                     role="none">
                         <lightning:combobox label="Task" name="task" value="{!v.currentTask}" 
-                            options="{!v.tasks}"
-                            onchange="{!c.onPtChange}"/>
+                            options="{!v.tasks}"/>
                     </div>
                 </div>
             </div>

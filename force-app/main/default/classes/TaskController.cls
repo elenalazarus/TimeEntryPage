@@ -4,7 +4,7 @@ public class TaskController {
 
 
     @AuraEnabled
-    public static TimeEntryModel initModel() {
+    public static TimeEntryModel getModelOfTasksForCurrentConsultant() {
         Id currentConsultantId = 
             [SELECT Primary_Contact__c FROM Project__c WHERE Primary_Contact__c != null][0].Primary_Contact__c;
         Contact currentConsultant = [SELECT Id, Name FROM Contact WHERE Id = :currentConsultantId];
@@ -31,10 +31,61 @@ public class TaskController {
     }
 
     @AuraEnabled
-    public static updatedTimeEntryModel initClassWithNeededTasks(Id consultantId, Date currentWeekDate) {
+    public static UpdatedTimeEntryModel getModelOfTasksWithTimesForConsultantAndForSpecificWeek(
+        Id consultantId, Date currentWeekDate
+    ) {
         updatedTimeEntryModel updatedTem = new updatedTimeEntryModel();
         updatedTem.taskWrappers = getTaskWrappers(consultantId, currentWeekDate);
         return updatedTem;
+    }
+
+    @AuraEnabled
+    public static List<Task__c> getNotReportedTasks(
+        List<Id> reportedTaskIds, Id currentConsultantId, Id currentProjectId
+    ) {
+        if (reportedTaskIds.size() == 0) {
+            List<Task__c> unreportedTasks = [
+                SELECT Name FROM Task__c WHERE Consultant__c = :currentConsultantId AND Project__c = :currentProjectId
+            ];
+            return unreportedTasks;
+        }
+        List<Task__c> unreportedTasks = [
+            SELECT Name, Project__r.Name
+            FROM Task__c
+            WHERE Id not IN : reportedTaskIds 
+                AND Consultant__c = :currentConsultantId
+                AND Project__c = :currentProjectId
+        ];
+        return unreportedTasks;
+    }
+
+    @AuraEnabled
+    public static List<Project__c> getAllProjects(Id currentConsultantId) {
+        List<Project__c> allProjects = [
+            SELECT Name FROM Project__c WHERE Primary_Contact__c = :currentConsultantId
+        ];
+        return allProjects;
+    }
+
+    @AuraEnabled
+    public static TaskWrapper addTaskToUI(Id taskId, Date currentWeekDate) {
+        Task__c chosenTask = [SELECT Name, Project__r.Name, Billing_Rule__c FROM Task__c WHERE Id = :taskId];
+        List<Time__c> timesForChosenTask = TaskServices.getTimesByTask(currentWeekDate, chosenTask);
+        TaskWrapper addedTaskByUser = new TaskWrapper();
+        addedTaskByUser.task = chosenTask;
+        addedTaskByUser.times = timesForChosenTask ;
+        return addedTaskByUser;
+    }
+
+    @AuraEnabled
+    public static void insertNewReportedHours(List<Time__c> timesToInsert){
+        Integer numberOfInsertedRecords = [
+            SELECT COUNT()
+            FROM Time__c
+            WHERE Task__c = :timesToInsert[0].Task__c AND Date__c = :timesToInsert[0].Date__c];
+            if (numberOfInsertedRecords == 0) {
+                insert timesToInsert;
+            }
     }
 
     public with sharing class TimeEntryModel {
