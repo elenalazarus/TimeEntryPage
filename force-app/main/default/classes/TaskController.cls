@@ -78,14 +78,31 @@ public class TaskController {
     }
 
     @AuraEnabled
-    public static void insertNewReportedHours(List<Time__c> timesToInsert){
-        Integer numberOfInsertedRecords = [
-            SELECT COUNT()
+    public static void insertNewReportedHours(List<Id> taskIds, List<Time__c> reportedTimes) {
+        List<Time__c> timesToUpsert = new List<Time__c>();
+        Date currentWeekDate = reportedTimes[0].Date__c;
+        List<Time__c> insertedTimes = [
+            SELECT Id, Time_spend__c, Task__c, Date__c
             FROM Time__c
-            WHERE Task__c = :timesToInsert[0].Task__c AND Date__c = :timesToInsert[0].Date__c];
-            if (numberOfInsertedRecords == 0) {
-                insert timesToInsert;
+            WHERE Task__c IN :taskIds
+                AND Date__c >= : currentWeekDate
+                AND Date__c <= :currentWeekDate.addDays(6)];
+        Map<String, Time__c> taskDateToTime = new Map<String, Time__c>();
+        for (Time__c workTime : insertedTimes) {
+            taskDateToTime.put(workTime.Task__c + ' ' + workTime.Date__c, workTime);
+        }
+        for (Time__c workTime : reportedTimes) {
+            String taskDate = workTime.Task__c + ' ' + workTime.Date__c;
+            if (taskDateToTime.containsKey(taskDate)) {
+                Time__c insertedTime = taskDateToTime.get(taskDate);
+                insertedTime.Time_spend__c = workTime.Time_spend__c;
+                timesToUpsert.add(insertedTime);
             }
+            else {
+                timesToUpsert.add(workTime);
+            }
+        }
+        upsert timesToUpsert;
     }
 
     public with sharing class TimeEntryModel {

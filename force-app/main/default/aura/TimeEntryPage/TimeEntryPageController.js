@@ -41,7 +41,7 @@
     },
 
     onDeleteClick : function(component, event, helper) {
-        helper.deleteReportedHours(component);
+        helper.deleteReportedHours(event, component);
     },
 
 })

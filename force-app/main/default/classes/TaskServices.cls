@@ -54,11 +54,12 @@ public with sharing class TaskServices {
 
     public static List<Time__c> getTimesByTask(Date currentWeekDate, Task__c task) {
         Integer numberOfWorkDays = 7;
-        List<Time__c> times = [SELECT Time_spend__c, Date__c, Task__c, Task__r.Billing_Rule__c, Task__r.Project__c 
-                               FROM Time__c 
-                               WHERE Task__c = :task.Id 
-                               	   AND Date__c >= :currentWeekDate
-                                   AND Date__c <= :currentWeekDate.addDays(6)
+        List<Time__c> times = [
+            SELECT Time_spend__c, Date__c, Task__c, Task__r.Billing_Rule__c, Task__r.Project__c 
+            FROM Time__c 
+            WHERE Task__c = :task.Id 
+                AND Date__c >= :currentWeekDate
+                AND Date__c <= :currentWeekDate.addDays(6)
         ];
         Map<Date, Time__c> existedWorkDateToTime = new Map<Date, Time__c>();
         Map<Date, Time__c> allWorkDateToTime = new Map<Date, Time__c>();
@@ -69,7 +70,7 @@ public with sharing class TaskServices {
         for (Integer i = 0; i < numberOfWorkDays; i++) {
             if (!existedWorkDateToTime.containsKey(currentWeekDate.addDays(i))) {
                 Time__c emptyTime = new Time__c(
-                        Name=currentWeekDate.addDays(i) + ' ' + task.Id,
+                        Name=currentWeekDate.addDays(i).format() + ' ' + task.Name,
                         Billing_Rule__c=task.Billing_Rule__c,
                         Task__c=task.Id,
                         Project__c=task.Project__c,

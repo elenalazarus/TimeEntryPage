@@ -44,6 +44,7 @@
             <table class="slds-table slds-table--bordered slds-table--cell-buffer slds-max-medium-table--stacked-horizontal">
                 <thead>
                     <tr class="slds-line-height_reset">
+                        <th scope="col"/>
                         <th scope="col">
                             <div class="slds-truncate" title="Task__c">Task</div>
                         </th>
@@ -79,6 +80,9 @@
                 <tbody>
                     <aura:iteration items="{!v.objTimeEntryModel.taskWrappers}" var="taskWrapper" indexVar="i">
                         <tr>
+                            <td data-label="Select">
+                                <ui:inputCheckbox aura:id="checkbox" change="{!c.onCheck}"/>
+                            </td>
                             <td data-label="Name">
                                 <div class="slds-truncate" title="{! taskWrapper.task.Name }">{! taskWrapper.task.Name }</div>
                             </td>
@@ -103,10 +107,11 @@
                             </td>
                         <aura:iteration items="{!taskWrapper.times}" var="time" indexVar="j">
                             <td>
-                                <div class="slds-truncate" title="{!time.Time_spend__c}">{!time.Time_spend__c}</div>
+                                <ui:inputText class="field" labelClass="slds-form-element__label"
+                                    value="{!time.Time_spend__c}"/>
                             </td>
                         </aura:iteration>
-                        <lightning:button label="x" title="x" onclick="{! c.onDeleteClick }"/>
+                        <lightning:button value="{!taskWrapper.task.Id}" label="x" title="x" onclick="{! c.onDeleteClick }"/>
                         </tr>
                     </aura:iteration>
                 </tbody>

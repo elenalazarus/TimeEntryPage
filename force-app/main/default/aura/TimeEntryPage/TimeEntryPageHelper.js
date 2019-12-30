@@ -122,18 +122,20 @@
 
     saveReportedHours : function(component) {
         var taskWrappers = component.get("v.objTimeEntryModel.taskWrappers");
-        var timesToInsert = [];
+        var reportedTimes = [];
+        var taskIds = [];
         for (var i = 0; i < taskWrappers.length; i++) {
+            taskIds.push(taskWrappers[i].task.Id);
             for (var k = 0; k < taskWrappers[i].times.length; k++)
-                timesToInsert.push(taskWrappers[i].times[k]);
+                reportedTimes.push(taskWrappers[i].times[k]);
         }
         var action = component.get("c.insertNewReportedHours");
         action.setParams({
-            timesToInsert : timesToInsert
+            taskIds : taskIds,
+            reportedTimes : reportedTimes
         });
         action.setCallback(this, function(response) {
             if (response.getState() === "SUCCESS") {
-                component.set('v.objTimeEntryModel.taskWrappers', taskWrappers);
             }
             else {
                 console.log("Failed with state: " + response.getState());
@@ -142,7 +144,15 @@
         $A.enqueueAction(action);
     },
 
-    deleteReportedHours : function(component) {
-        
+    deleteReportedHours : function(event, component) {
+        var taskWrappers = component.get("v.objTimeEntryModel.taskWrappers");
+        var buttonId = event.getSource().get("v.value");
+        for (var i = 0; i < taskWrappers.length; i++) {
+            if (taskWrappers[i].task.Id == buttonId) {
+                taskWrappers.splice(i, 1);
+                break;
+            }
+        }
+        component.set("v.objTimeEntryModel.taskWrappers", taskWrappers);
     }
 })
